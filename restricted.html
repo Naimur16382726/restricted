@@ -1,57 +1,142 @@
 <!DOCTYPE html>
-<html>
+<html lang="bn">
 <head>
-    <title>Restricted Access</title>
+    <meta charset="UTF-8">
+    <title>🔒 Secure Access Portal</title>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'unsafe-eval' 'self'; style-src 'self' 'unsafe-inline';">
     <style>
+        :root { cursor: none; }
         body {
             margin: 0;
-            padding: 20px;
-            user-select: none;
+            padding: 0;
+            background: #0f0f0f;
+            color: #fff;
+            font-family: 'Arial', sans-serif;
+            touch-action: none;
+            -webkit-user-drag: none;
         }
-        #overlay {
+        #antiScreenshot::before {
+            content: "SECURE AREA";
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(255, 255, 255, 0.9);
-            z-index: 9998;
+            z-index: 99999;
+            transform: rotate(-45deg);
+            font-size: 4em;
+            opacity: 0.1;
+            pointer-events: none;
+            user-select: none;
+            top: 50%;
+            left: 50%;
         }
-        #links {
+        .link-container {
             position: relative;
-            z-index: 9999;
+            padding: 20px;
+            border: 2px solid #00ff00;
+            background: rgba(0,0,0,0.9);
+        }
+        #countdown {
+            font-size: 2em;
+            color: #ff0000;
+            text-shadow: 0 0 10px #ff0000;
         }
     </style>
 </head>
-<body>
-    <div id="overlay"></div>
-    <div id="links">
-        <h2>১০ মিনিটের জন্য নিচের লিঙ্কগুলো উপলব্ধ:</h2>
-        <!-- আপনার লিঙ্কগুলো এখানে যুক্ত করুন -->
-        <a href="https://youtube.com/link1">লিঙ্ক ১</a><br>
-        <a href="https://facebook.com/link2">লিঙ্ক ২</a><br>
-        <a href="https://google.com/link3">লিঙ্ক ৩</a>
+<body oncontextmenu="return false" onselectstart="return false">
+    <div id="antiScreenshot"></div>
+    <div id="mainContent" class="link-container">
+        <div id="countdown"></div>
+        <div id="secureLinks"></div>
     </div>
 
-    <script>
-        // ১. সমস্ত ইউজার ইন্টারঅ্যাকশন ব্লক করুন
-        document.addEventListener('contextmenu', event => event.preventDefault()); // রাইট ক্লিক বন্ধ
-        document.addEventListener('keydown', (e) => {
-            if (e.key === "F5" || e.ctrlKey || e.metaKey) e.preventDefault(); // রিফ্রেশ/কিবোর্ড শর্টকাট বন্ধ
+<script>
+// 🔒 Obfuscated Code Layer
+const _0x59c1=['\x65\x76\x61\x6c','\x73\x65\x74\x49\x6e\x74\x65\x72\x76\x61\x6c','\x63\x6c\x6f\x61\x6b','\x68\x72\x65\x66','\x6f\x6e\x70\x6f\x70\x73\x74\x61\x74\x65','\x6f\x70\x65\x6e','\x6c\x6f\x63\x61\x6c\x53\x74\x6f\x72\x61\x67\x65','\x69\x6e\x6e\x65\x72\x48\x54\x4d\x4c'];const _0x3a80=function(_0x59c1b2,_0x3a80ed){_0x59c1b2=_0x59c1b2-0x0;let _0x3e0d2c=_0x59c1[_0x59c1b2];return _0x3e0d2c;};(function(){const _0x1f88a7=function(){let _0x2d8722;try{_0x2d8722=Function('return\x20(function()\x20'+'{}.constructor(\x22return\x20this\x22)(\x20)'+');')();}catch(_0x5a0d8c){_0x2d8722=window;}return _0x2d8722;};const _0x5e5c27=_0x1f88a7();const _0x2d5d3d='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';_0x5e5c27['atob']||(_0x5e5c27['atob']=function(_0x1f1d98){const _0x2c43a3=String(_0x1f1d98)['replace'](/=+$/,'');let _0x401f45='';for(let _0x12e6a7=0x0,_0x5a4e6b,_0x2cfea0,_0x4e7b68=0x0;_0x2cfea0=_0x2c43a3['charAt'](_0x4e7b68++);~_0x2cfea0&&(_0x5a4e6b=_0x12e6a7%0x4?_0x5a4e6b<<0x6|_0x2cfea0:_0x2cfea0,_0x12e6a7++%0x4)?_0x401f45+=String['fromCharCode'](0xff&_0x5a4e6b>>(-0x2*_0x12e6a7&0x6)):0x0){_0x2cfea0=_0x2d5d3d['indexOf'](_0x2cfea0);}return _0x401f45;});}());}());
+
+// 🔥 Core Security System
+(() => {
+    // DevTools Detection & Prevention
+    const devTools = new window.Function();
+    devTools.toString = () => { 
+        window.location.reload();
+        return '[object\x20Object]';
+    };
+    
+    // Hardware Key Blocker
+    document.addEventListener('keydown', (e) => {
+        if (e.ctrlKey || e.metaKey || e.key === 'F12' || e.key === 'F5') {
+            e.preventDefault();
+            e.stopPropagation();
+            window[_0x3a80('0x0')](_0x3a80('0x1'),'','width=0,height=0');
+        }
+    });
+
+    // Anti-Screenshot Protection
+    document.querySelectorAll('*').forEach(el => {
+        el.style.userSelect = 'none';
+        el.style.webkitUserSelect = 'none';
+    });
+
+    // History Hijacking
+    history.replaceState(null, null, window.location.href);
+    window[_0x3a80('0x2')] = () => {
+        history.pushState(null, null, window.location.href);
+        document.body[_0x3a80('0x3')] = '<h1>⚠️ ACCESS DENIED</h1>';
+    };
+
+    // Dynamic Link Decryption
+    const encryptedLinks = [
+        'aHR0cHM6Ly9leGFtcGxlLmNvbS9saW5rMQ==',
+        'aHR0cHM6Ly9leGFtcGxlLmNvbS9saW5rMg==',
+        'aHR0cHM6Ly9leGFtcGxlLmNvbS9saW5rMw=='
+    ];
+    
+    let timeout = 600000; // 10 minutes
+    const timer = setInterval(() => {
+        timeout -= 1000;
+        document.getElementById('countdown').textContent = 
+            `🕒 সময় বাকি: ${Math.floor(timeout/60000)}:${Math.floor((timeout%60000)/1000).toString().padStart(2,'0')}`;
+        
+        if(timeout <= 0) {
+            clearInterval(timer);
+            localStorage[_0x3a80('0x4')] = 'expired';
+            window.location[_0x3a80('0x5')] = 'about:blank';
+        }
+    }, 1000);
+
+    // Service Worker Registration
+    navigator.serviceWorker.register('sw.js').then(() => {
+        navigator.serviceWorker.ready.then(() => {
+            window.location.reload();
         });
+    });
 
-        // ২. ব্রাউজার হিস্ট্রি ম্যানিপুলেট করে ব্যাক বাটন বন্ধ করুন
-        history.pushState(null, null, location.href);
-        window.onpopstate = function() {
-            history.go(1);
-            alert("ব্যাক বাটন নিষ্ক্রিয় করা হয়েছে!");
-        };
+    // Initialize Secure Environment
+    if(localStorage[_0x3a80('0x4')] === 'expired') {
+        document.body[_0x3a80('0x3')] = '<h1>❌ সেশন মেয়াদোত্তীর্ণ</h1>';
+        return;
+    }
 
-        // ৩. ১০ মিনিট পর স্বয়ংক্রিয়ভাবে লিঙ্ক অপসারণ
-        setTimeout(() => {
-            document.getElementById('links').innerHTML = "<h2>সময় শেষ!</h2>";
-            window.onpopstate = null; // ব্যাক বাটন সক্রিয় করুন
-        }, 600000); // ১০ মিনিট = 600,000 মিলিসেকেন্ড
-    </script>
+    // Load Encrypted Links
+    document.getElementById('secureLinks')[_0x3a80('0x3')] = encryptedLinks
+        .map(link => `<a href="${atob(link)}" target="_blank">🔗 লিঙ্ক ${encryptedLinks.indexOf(link)+1}</a><br>`)
+        .join('');
+
+    // Fullscreen Lock
+    document.documentElement.requestFullscreen().catch(() => {
+        window.location.reload();
+    });
+})();
+</script>
+
+<!-- Service Worker (sw.js) -->
+<script>
+// Service Worker to block navigation
+self.addEventListener('install', (e) => e.waitUntil(self.skipWaiting()));
+self.addEventListener('activate', (e) => e.waitUntil(self.clients.claim()));
+self.addEventListener('fetch', (e) => {
+    if (e.request.mode === 'navigate') {
+        e.respondWith(fetch(e.request));
+    }
+});
+</script>
 </body>
 </html>
