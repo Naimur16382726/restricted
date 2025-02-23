@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>NeuroPuzzle Pro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2a2b2e;
+            --secondary: #5c6b73;
+            --accent: #c7d3d8;
+            --neon: #00ff9d;
+        }
+
+        body {
+            margin: 0;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            color: var(--accent);
+            font-family: 'Orbitron', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .game-container {
+            background: rgba(42, 43, 46, 0.8);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(92, 107, 115, 0.2);
+            margin-top: 2rem;
+        }
+
+        .puzzle-grid {
+            display: grid;
+            gap: 5px;
+            margin: 2rem 0;
+            transform-style: preserve-3d;
+        }
+
+        .tile {
+            background: rgba(92, 107, 115, 0.3);
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            transform: translateZ(0);
+        }
+
+        .tile:hover {
+            background: rgba(92, 107, 115, 0.5);
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 4px 15px rgba(0, 255, 157, 0.2);
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+        }
+
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        button {
+            background: rgba(92, 107, 115, 0.3);
+            border: 1px solid var(--neon);
+            color: var(--neon);
+            padding: 0.8rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        button:hover {
+            background: var(--neon);
+            color: var(--primary);
+            box-shadow: 0 0 15px var(--neon);
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div class="stats">
+            <div>🕒 Time: <span id="timer">00:00</span></div>
+            <div>🎯 Moves: <span id="moves">0</span></div>
+        </div>
+        <div class="puzzle-grid" id="grid"></div>
+        <div class="controls">
+            <button onclick="showHint()">💡 Hint</button>
+            <button onclick="shuffleTiles()">🔀 Shuffle</button>
+            <button onclick="toggleAI()">🤖 AI Solve</button>
+        </div>
+    </div>
+
+<script>
+const PuzzleMaster = (() => {
+    const size = 4;
+    let tiles = [];
+    let emptyPos = size * size - 1;
+    let moves = 0;
+    let timer = 0;
+    let interval;
+    let isSolving = false;
+
+    const createGrid = () => {
+        const grid = document.getElementById('grid');
+        grid.style.gridTemplateColumns = `repeat(${size}, 1fr)`;
+        grid.innerHTML = '';
+        
+        for(let i=0; i<size*size; i++) {
+            const tile = document.createElement('div');
+            tile.className = 'tile';
+            tile.textContent = i+1;
+            tile.style.aspectRatio = '1';
+            tile.addEventListener('click', () => moveTile(i));
+            tiles.push(tile);
+            grid.appendChild(tile);
+        }
+        tiles[emptyPos].style.visibility = 'hidden';
+    };
+
+    const shuffleTiles = () => {
+        if(isSolving) return;
+        const shuffleMoves = 1000;
+        for(let i=0; i<shuffleMoves; i++) {
+            const neighbors = getNeighbors(emptyPos);
+            const randomMove = neighbors[Math.floor(Math.random()*neighbors.length)];
+            swapTiles(randomMove, emptyPos);
+            emptyPos = randomMove;
+        }
+        moves = 0;
+        updateDisplay();
+    };
+
+    const getNeighbors = (pos) => {
+        const neighbors = [];
+        if(pos % size !== 0) neighbors.push(pos - 1); // Left
+        if(pos % size !== size-1) neighbors.push(pos + 1); // Right
+        if(pos >= size) neighbors.push(pos - size); // Up
+        if(pos < size*(size-1)) neighbors.push(pos + size); // Down
+        return neighbors;
+    };
+
+    const moveTile = (pos) => {
+        if(isSolving || !getNeighbors(emptyPos).includes(pos)) return;
+        swapTiles(pos, emptyPos);
+        emptyPos = pos;
+        moves++;
+        checkWin();
+        updateDisplay();
+    };
+
+    const swapTiles = (a, b) => {
+        [tiles[a].textContent, tiles[b].textContent] = [tiles[b].textContent, tiles[a].textContent];
+        [tiles[a].style.visibility, tiles[b].style.visibility] = [tiles[b].style.visibility, tiles[a].style.visibility];
+    };
+
+    const checkWin = () => {
+        if(tiles.every((tile, index) => 
+            tile.textContent == index+1 || index === size*size-1)) {
+            clearInterval(interval);
+            alert(`🎉 You won in ${moves} moves! Time: ${formatTime(timer)}`);
+        }
+    };
+
+    const updateDisplay = () => {
+        document.getElementById('moves').textContent = moves;
+    };
+
+    const formatTime = (seconds) => {
+        const mins = Math.floor(seconds/60).toString().padStart(2,'0');
+        const secs = (seconds%60).toString().padStart(2,'0');
+        return `${mins}:${secs}`;
+    };
+
+    const showHint = () => {
+        // AI-powered hint system
+        const solutionPath = solvePuzzle();
+        if(solutionPath.length > 0) {
+            animateSolution(solutionPath.reverse());
+        }
+    };
+
+    const solvePuzzle = () => {
+        // A* Algorithm implementation
+        const target = Array.from({length: size*size}, (_,i) => i+1);
+        target[size*size-1] = 0;
+
+        const priorityQueue = [{
+            state: tiles.map(t => parseInt(t.textContent) || 0),
+            moves: [],
+            cost: 0
+        }];
+
+        const visited = new Set();
+
+        while(priorityQueue.length > 0) {
+            const current = priorityQueue.shift();
+            
+            if(current.state.join(',') === target.join(',')) {
+                return current.moves;
+            }
+
+            const emptyIndex = current.state.indexOf(0);
+            const neighbors = getNeighbors(emptyIndex);
+
+            for(const pos of neighbors) {
+                const newState = [...current.state];
+                [newState[pos], newState[emptyIndex]] = 
+                    [newState[emptyIndex], newState[pos]];
+                
+                const stateKey = newState.join(',');
+                if(!visited.has(stateKey)) {
+                    visited.add(stateKey);
+                    priorityQueue.push({
+                        state: newState,
+                        moves: [...current.moves, pos],
+                        cost: current.cost + 1 + heuristic(newState)
+                    });
+                }
+            }
+            priorityQueue.sort((a,b) => a.cost - b.cost);
+        }
+        return [];
+    };
+
+    const heuristic = (state) => {
+        // Manhattan distance heuristic
+        let distance = 0;
+        for(let i=0; i<state.length; i++) {
+            if(state[i] === 0) continue;
+            const targetRow = Math.floor((state[i]-1)/size);
+            const targetCol = (state[i]-1) % size;
+            const currentRow = Math.floor(i/size);
+            const currentCol = i % size;
+            distance += Math.abs(targetRow - currentRow) + 
+                        Math.abs(targetCol - currentCol);
+        }
+        return distance;
+    };
+
+    const animateSolution = (path) => {
+        isSolving = true;
+        let step = 0;
+        const interval = setInterval(() => {
+            if(step >= path.length) {
+                clearInterval(interval);
+                isSolving = false;
+                return;
+            }
+            moveTile(path[step]);
+            step++;
+        }, 300);
+    };
+
+    return {
+        init: () => {
+            createGrid();
+            interval = setInterval(() => {
+                timer++;
+                document.getElementById('timer').textContent = formatTime(timer);
+            }, 1000);
+            shuffleTiles();
+        },
+        shuffleTiles,
+        showHint,
+        toggleAI: () => {
+            isSolving = !isSolving;
+            if(isSolving) showHint();
+        }
+    };
+})();
+
+document.addEventListener('DOMContentLoaded', PuzzleMaster.init);
+</script>
+</body>
+</html>
