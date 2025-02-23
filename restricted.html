@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Restricted Access</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            user-select: none;
+        }
+        #overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            z-index: 9998;
+        }
+        #links {
+            position: relative;
+            z-index: 9999;
+        }
+    </style>
+</head>
+<body>
+    <div id="overlay"></div>
+    <div id="links">
+        <h2>১০ মিনিটের জন্য নিচের লিঙ্কগুলো উপলব্ধ:</h2>
+        <!-- আপনার লিঙ্কগুলো এখানে যুক্ত করুন -->
+        <a href="https://youtube.com/link1">লিঙ্ক ১</a><br>
+        <a href="https://facebook.com/link2">লিঙ্ক ২</a><br>
+        <a href="https://google.com/link3">লিঙ্ক ৩</a>
+    </div>
+
+    <script>
+        // ১. সমস্ত ইউজার ইন্টারঅ্যাকশন ব্লক করুন
+        document.addEventListener('contextmenu', event => event.preventDefault()); // রাইট ক্লিক বন্ধ
+        document.addEventListener('keydown', (e) => {
+            if (e.key === "F5" || e.ctrlKey || e.metaKey) e.preventDefault(); // রিফ্রেশ/কিবোর্ড শর্টকাট বন্ধ
+        });
+
+        // ২. ব্রাউজার হিস্ট্রি ম্যানিপুলেট করে ব্যাক বাটন বন্ধ করুন
+        history.pushState(null, null, location.href);
+        window.onpopstate = function() {
+            history.go(1);
+            alert("ব্যাক বাটন নিষ্ক্রিয় করা হয়েছে!");
+        };
+
+        // ৩. ১০ মিনিট পর স্বয়ংক্রিয়ভাবে লিঙ্ক অপসারণ
+        setTimeout(() => {
+            document.getElementById('links').innerHTML = "<h2>সময় শেষ!</h2>";
+            window.onpopstate = null; // ব্যাক বাটন সক্রিয় করুন
+        }, 600000); // ১০ মিনিট = 600,000 মিলিসেকেন্ড
+    </script>
+</body>
+</html>
